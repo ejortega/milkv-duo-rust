@@ -63,3 +63,25 @@ This is inspired from reading https://barretts.club/posts/i-got-a-milkv-duo/.
    ```bash
    docker run --rm -e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -v $PWD:/app ejortega/duo-rust cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std --release
    ```
+
+## Troubleshooting
+If you have trouble running the binary on the milk-v duo, the article mentions you can get by using:
+```bash
+ln -sf /lib/ld-musl-riscv64v0p7_xthead.so.1 /lib/ld-musl-riscv64.so.1
+```
+However, I would still get an error:
+```bash
+[root@milkv-duo]~# ./milkv-duo-rust 
+Error relocating ./milkv-duo-rust: pthread_getname_np: symbol not found
+Error relocating ./milkv-duo-rust: pthread_getname_np: symbol not found
+```
+I was able to get away with copying `libc.so` from the toolchain onto the milk-v duo.
+```bash
+scp ./riscv64-lp64d--musl--bleeding-edge-2023.11-1/riscv64-buildroot-linux-musl/sysroot/lib/libc.so root@192.168.42.1:/lib/ld-musl-riscv64.so.1
+```
+
+```bash
+[root@milkv-duo]~# ./milkv-duo-rust 
+Hello, world!
+1970-01-01T00:47:05.638969Z  INFO milkv_duo_rust: Rust is the future
+```
