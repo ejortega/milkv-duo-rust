@@ -1,49 +1,57 @@
 use std::fs;
 use std::path::Path;
 
-pub struct Gpio {
+const GPIO_PATH: &str = "/sys/class/gpio";
+
+pub struct GpioSysfs {
     gpio_num: u32,
 }
 
-impl Gpio {
-    pub fn new(gpio_num: u32) -> anyhow::Result<Gpio> {
-        Gpio::export_gpio(gpio_num)?;
+impl GpioSysfs {
+    pub fn new(gpio_num: u32) -> anyhow::Result<GpioSysfs> {
+        GpioSysfs::export_gpio(gpio_num)?;
 
-        Ok(Gpio { gpio_num })
+        Ok(GpioSysfs { gpio_num })
     }
 
     fn export_gpio(gpio_num: u32) -> anyhow::Result<()> {
+        let path = format!("{GPIO_PATH}/export");
+
         Ok(fs::write(
-            "/sys/class/gpio/export",
+            Path::new(&path),
             gpio_num.to_string().as_bytes(),
         )?)
     }
 
     pub fn set_gpio_direction(&self, direction: &str) -> anyhow::Result<()> {
-        let path = format!("/sys/class/gpio/gpio{}/direction", self.gpio_num);
+        let path = format!("{GPIO_PATH}/gpio{}/direction", self.gpio_num);
+
         Ok(fs::write(Path::new(&path), direction.as_bytes())?)
     }
 
     pub fn write_gpio_value(&self, value: u8) -> anyhow::Result<()> {
-        let path = format!("/sys/class/gpio/gpio{}/value", self.gpio_num);
+        let path = format!("{GPIO_PATH}/gpio{}/value", self.gpio_num);
+
         Ok(fs::write(Path::new(&path), value.to_string().as_bytes())?)
     }
 
-    #[allow(dead_code)]
     pub fn read_gpio_value(&self) -> anyhow::Result<String> {
-        let path = format!("/sys/class/gpio/gpio{}/value", self.gpio_num);
+        let path = format!("{GPIO_PATH}/gpio{}/value", self.gpio_num);
+
         Ok(fs::read_to_string(Path::new(&path))?)
     }
 
-    fn unexport_gpio(&self) -> anyhow::Result<()> {
+    pub fn unexport_gpio(&self) -> anyhow::Result<()> {
+        let path = format!("{GPIO_PATH}/unexport");
+
         Ok(fs::write(
-            "/sys/class/gpio/unexport",
+            Path::new(&path),
             self.gpio_num.to_string().as_bytes(),
         )?)
     }
 }
 
-impl Drop for Gpio {
+impl Drop for GpioSysfs {
     fn drop(&mut self) {
         let _ = self.set_gpio_direction("in");
         let _ = self.unexport_gpio();
