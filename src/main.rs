@@ -5,9 +5,8 @@ use std::sync::Arc;
 mod blink;
 use crate::blink::Gpio;
 
-#[tokio::main(flavor = "current_thread")]
 #[tracing::instrument]
-async fn main() -> anyhow::Result<()> {
+fn main() -> anyhow::Result<()> {
     let should_terminate = Arc::new(AtomicBool::new(false));
     setup_signal_handler(should_terminate.clone())?;
 
@@ -16,7 +15,7 @@ async fn main() -> anyhow::Result<()> {
 
     println!("Hello, world!");
 
-    tracing::info!("Rust is the future");
+    tracing::info!("Rust is the future!");
 
     blink_led(should_terminate)?;
 
@@ -35,8 +34,11 @@ fn blink_led(should_terminate: Arc<AtomicBool>) -> anyhow::Result<()> {
 
     while !should_terminate.load(Ordering::SeqCst) {
         gpio.write_gpio_value(1)?;
+        println!("LED ON");
         std::thread::sleep(std::time::Duration::from_secs(1));
+
         gpio.write_gpio_value(0)?;
+        println!("LED OFF");
         std::thread::sleep(std::time::Duration::from_secs(1));
     }
 
