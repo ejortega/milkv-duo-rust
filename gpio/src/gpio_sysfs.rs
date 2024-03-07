@@ -17,10 +17,7 @@ impl GpioSysfs {
     fn export_gpio(gpio_num: u32) -> anyhow::Result<()> {
         let path = format!("{GPIO_PATH}/export");
 
-        Ok(fs::write(
-            Path::new(&path),
-            gpio_num.to_string().as_bytes(),
-        )?)
+        Ok(fs::write(Path::new(&path), gpio_num.to_string().as_bytes())?)
     }
 
     pub fn set_gpio_direction(&self, direction: &str) -> anyhow::Result<()> {
@@ -44,10 +41,7 @@ impl GpioSysfs {
     pub fn unexport_gpio(&self) -> anyhow::Result<()> {
         let path = format!("{GPIO_PATH}/unexport");
 
-        Ok(fs::write(
-            Path::new(&path),
-            self.gpio_num.to_string().as_bytes(),
-        )?)
+        Ok(fs::write(Path::new(&path), self.gpio_num.to_string().as_bytes())?)
     }
 }
 

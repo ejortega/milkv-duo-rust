@@ -1,8 +1,9 @@
-use signal_hook::{consts::SIGINT, iterator::Signals};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
 use gpio::gpio_sysfs::GpioSysfs;
+use signal_hook::consts::SIGINT;
+use signal_hook::iterator::Signals;
 
 fn main() -> anyhow::Result<()> {
     let should_terminate = Arc::new(AtomicBool::new(false));
