@@ -26,6 +26,16 @@ This is inspired from reading https://barretts.club/posts/i-got-a-milkv-duo/.
      ```
    - Update `.config/config.toml` in your project if you use a different toolchain version.
 
+3. **Compile:**
+    - Debug
+    ```bash
+    cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std
+    ```
+    - Release
+    ```bash
+    cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std --release
+    ```
+
 ## Docker Instructions
 
 ### Build and Run Your Own Image
