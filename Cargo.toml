@@ -7,6 +7,8 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.80"
+signal-hook = "0.3.17"
+signal-hook-tokio = "0.3.1"
 tokio = { version = "1.36.0", features = ["rt", "macros"] }
 tracing = { version = "0.1.40", features = ["async-await"] }
 tracing-subscriber = "0.3.18"
