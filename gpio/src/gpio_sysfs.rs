@@ -1,53 +1,73 @@
-use std::fs;
 use std::path::Path;
 
+use anyhow::Result;
+
+use crate::FileSystemOps;
+
 const GPIO_PATH: &str = "/sys/class/gpio";
+const DIRECTION_IN: &str = "in";
+const DIRECTION_OUT: &str = "out";
+const EXPORT: &str = "export";
+const UNEXPORT: &str = "unexport";
+const VALUE: &str = "value";
+const DIRECTION: &str = "direction";
 
-pub struct GpioSysfs {
-    gpio_num: u32,
+pub struct GpioSysfs<F: FileSystemOps> {
+    gpio_pin: u32,
+    gpio_label: String,
+    fs_ops: F,
 }
 
-impl GpioSysfs {
-    pub fn new(gpio_num: u32) -> anyhow::Result<GpioSysfs> {
-        GpioSysfs::export_gpio(gpio_num)?;
+impl<F: FileSystemOps> GpioSysfs<F> {
+    pub fn new(gpio_pin: u32, fs_ops: F) -> Result<Self> {
+        let gpio_label = format!("gpio{gpio_pin}");
+        let gpio = GpioSysfs { gpio_pin, gpio_label, fs_ops };
+        gpio.export_gpio()?;
 
-        Ok(GpioSysfs { gpio_num })
+        Ok(gpio)
     }
 
-    fn export_gpio(gpio_num: u32) -> anyhow::Result<()> {
-        let path = format!("{GPIO_PATH}/export");
-
-        Ok(fs::write(Path::new(&path), gpio_num.to_string().as_bytes())?)
+    fn export_gpio(&self) -> Result<()> {
+        let path = Path::new(GPIO_PATH).join(EXPORT);
+        self.fs_ops.write(&path, self.gpio_pin.to_string().as_bytes())
     }
 
-    pub fn set_gpio_direction(&self, direction: &str) -> anyhow::Result<()> {
-        let path = format!("{GPIO_PATH}/gpio{}/direction", self.gpio_num);
-
-        Ok(fs::write(Path::new(&path), direction.as_bytes())?)
+    fn set_gpio_direction(&self, direction: &str) -> Result<()> {
+        let path = Path::new(GPIO_PATH).join(&self.gpio_label).join(DIRECTION);
+        self.fs_ops.write(&path, direction.as_bytes())
     }
 
-    pub fn write_gpio_value(&self, value: u8) -> anyhow::Result<()> {
-        let path = format!("{GPIO_PATH}/gpio{}/value", self.gpio_num);
-
-        Ok(fs::write(Path::new(&path), value.to_string().as_bytes())?)
+    pub fn set_pin_mode_input(&self) -> Result<()> {
+        self.set_gpio_direction(DIRECTION_IN)
     }
 
-    pub fn read_gpio_value(&self) -> anyhow::Result<String> {
-        let path = format!("{GPIO_PATH}/gpio{}/value", self.gpio_num);
-
-        Ok(fs::read_to_string(Path::new(&path))?)
+    pub fn set_pin_mode_output(&self) -> Result<()> {
+        self.set_gpio_direction(DIRECTION_OUT)
     }
 
-    pub fn unexport_gpio(&self) -> anyhow::Result<()> {
-        let path = format!("{GPIO_PATH}/unexport");
+    pub fn write_gpio_value(&self, value: u8) -> Result<()> {
+        let path = Path::new(GPIO_PATH).join(&self.gpio_label).join(VALUE);
+        self.fs_ops.write(&path, value.to_string().as_bytes())
+    }
 
-        Ok(fs::write(Path::new(&path), self.gpio_num.to_string().as_bytes())?)
+    pub fn read_gpio_value(&self) -> Result<String> {
+        let path = Path::new(GPIO_PATH).join(&self.gpio_label).join(VALUE);
+        self.fs_ops.read_to_string(&path)
+    }
+
+    pub fn unexport_gpio(&self) -> Result<()> {
+        let path = Path::new(GPIO_PATH).join(UNEXPORT);
+        self.fs_ops.write(&path, self.gpio_pin.to_string().as_bytes())
     }
 }
 
-impl Drop for GpioSysfs {
+impl<F: FileSystemOps> Drop for GpioSysfs<F> {
     fn drop(&mut self) {
-        let _ = self.set_gpio_direction("in");
-        let _ = self.unexport_gpio();
+        if let Err(e) = self.set_pin_mode_input() {
+            log::error!("Error trying to reset direction: {e}");
+        };
+        if let Err(e) = self.unexport_gpio() {
+            log::error!("Error trying to unexport pin {}: {e}", self.gpio_pin);
+        };
     }
 }
