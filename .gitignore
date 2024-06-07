@@ -1,4 +1,5 @@
 /target
 *.tar.bz2
+*.tar.gz
 riscv64-lp64d--musl*
 *.vscode/
