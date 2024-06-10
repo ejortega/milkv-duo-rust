@@ -3,7 +3,7 @@ use std::path::Path;
 use anyhow::Result;
 
 pub mod duo;
-pub mod gpio;
+pub mod gpio_mmap;
 pub mod gpio_sysfs;
 
 pub trait FileSystemOps {

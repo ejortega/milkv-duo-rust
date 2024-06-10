@@ -3,7 +3,7 @@ use std::path::Path;
 
 use anyhow::{anyhow, Result};
 
-use crate::gpio::DevMem;
+use crate::gpio_mmap::DevMem;
 use crate::GpioDirection::GpioInput;
 use crate::{FileSystemOps, Gpio, GpioDirection, GpioPort, IntLevelType, IntPolarity};
 
@@ -209,7 +209,7 @@ impl<'a> Gpio for MilkVDuoGpio<'a> {
 
         match level_type {
             IntLevelType::LevelSensitive => inttype_level_val &= !self.bitmask,
-            IntLevelType::EdgeSensitive => inttype_level_val |= !self.bitmask,
+            IntLevelType::EdgeSensitive => inttype_level_val |= self.bitmask,
         }
 
         self.dev.mem_write(inttype_level, inttype_level_val)
@@ -221,7 +221,7 @@ impl<'a> Gpio for MilkVDuoGpio<'a> {
 
         match polarity {
             IntPolarity::ActiveLow => int_polarity_val &= !self.bitmask,
-            IntPolarity::ActiveHigh => int_polarity_val |= !self.bitmask,
+            IntPolarity::ActiveHigh => int_polarity_val |= self.bitmask,
         };
 
         self.dev.mem_write(int_polarity, int_polarity_val)
@@ -236,7 +236,7 @@ impl<'a> Gpio for MilkVDuoGpio<'a> {
 
     fn disable(&self, addr: usize) -> Result<()> {
         let mut val = self.dev.mem_read(addr)?;
-        val &= self.bitmask;
+        val &= !self.bitmask;
 
         self.dev.mem_write(addr, val)
     }

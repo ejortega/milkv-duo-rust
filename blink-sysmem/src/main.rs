@@ -4,7 +4,7 @@ use std::thread::sleep;
 use std::time::Duration;
 
 use gpio::duo::{DuoGpio, GPIO2_BASE};
-use gpio::gpio::DevMem;
+use gpio::gpio_mmap::DevMem;
 use signal_hook::consts::SIGINT;
 use signal_hook::iterator::Signals;
 
