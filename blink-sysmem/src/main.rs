@@ -3,9 +3,8 @@ use std::sync::Arc;
 use std::thread::sleep;
 use std::time::Duration;
 
-use anyhow::Ok;
+use gpio::duo::{DuoGpio, GPIO2_BASE};
 use gpio::gpio_mmap::DevMem;
-use gpio::{MilkVDuoGpioRegisters, GPIO2_BASE};
 use signal_hook::consts::SIGINT;
 use signal_hook::iterator::Signals;
 
@@ -18,7 +17,7 @@ fn main() -> anyhow::Result<()> {
     setup_signal_handler(should_terminate.clone())?;
 
     let dev = DevMem::new()?;
-    let gpio = MilkVDuoGpioRegisters::new(GPIO2_BASE)?;
+    let gpio = DuoGpio::new(GPIO2_BASE)?;
     let swporta_ddr = gpio.swporta_ddr();
     tracing::info!("SWPORTA_DDR Address: {:#010x}", swporta_ddr);
     let swporta_dr = gpio.swporta_dr();

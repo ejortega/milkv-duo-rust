@@ -1,8 +1,8 @@
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
+use gpio::duo::DuoFileSystem;
 use gpio::gpio_sysfs::GpioSysfs;
-use gpio::milkv_duo::DuoFileSystem;
 use signal_hook::consts::SIGINT;
 use signal_hook::iterator::Signals;
 
