@@ -18,7 +18,9 @@ fn main() -> anyhow::Result<()> {
     let should_terminate = Arc::new(AtomicBool::new(false));
     setup_signal_handler(should_terminate.clone())?;
 
-    let pin = 25;
+    // https://milkv.io/docs/duo/getting-started/duo#duo-gpio-pinout
+    // XGPIOC[24]
+    let pin = 24;
     let duo_gpio: MilkVDuoGpio = Gpio::new(Port2, pin)?;
 
     // Enable LED (set GPIO to output mode)
