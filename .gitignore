@@ -1,5 +1,8 @@
 /target
 *.tar.bz2
 *.tar.gz
+*.tar.xz
 riscv64-lp64d--musl*
 *.vscode/
+.DS_Store
+*.zip

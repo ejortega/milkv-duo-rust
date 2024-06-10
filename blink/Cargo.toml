@@ -1,0 +1,12 @@
+[package]
+name = "blink"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+gpio = { path = "../gpio" }
+
+anyhow = "1.0.80"
+signal-hook = "0.3.17"
+tracing = { version = "0.1.40" }
+tracing-subscriber = "0.3.18"

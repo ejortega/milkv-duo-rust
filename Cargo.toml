@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["hello-world", "blink-sysfs", "blink-sysmem", "gpio"]
+members = ["hello-world", "blink", "blink-sysfs", "blink-sysmem", "gpio"]
 
 [profile.release]
 codegen-units = 1
