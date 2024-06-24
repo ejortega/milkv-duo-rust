@@ -1,10 +1,10 @@
 [target.riscv64gc-unknown-linux-musl]
-linker = "../riscv64-lp64d--musl--bleeding-edge-2023.11-1/bin/riscv64-buildroot-linux-musl-gcc.br_real"
+linker = "../toolchain-riscv64-unknown-linux-musl/bin/riscv64-unknown-linux-musl-gcc"
 rustflags = [
     "-C",
     "link-arg=-Wl,--dynamic-linker=/lib/ld-musl-riscv64v0p7_xthead.so.1",
     "-C",
     "target-feature=-crt-static",
     "-C",
-    "link-arg=--sysroot=../riscv64-lp64d--musl--bleeding-edge-2023.11-1/riscv64-buildroot-linux-musl/sysroot",
+    "link-arg=--sysroot=../toolchain-riscv64-unknown-linux-musl/riscv64-unknown-linux-musl/sysroot",
 ]

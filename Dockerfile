@@ -1,12 +1,13 @@
-FROM rustlang/rust:nightly-slim
+FROM rust:slim-bookworm
 
 ARG TARGET=riscv64gc-unknown-linux-gnu
+ARG TARGETPLATFORM
 
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y \
     build-essential \
-    wget \
+    curl \
     gosu \
     # Perform cleanup
     && apt-get autoclean \
@@ -14,12 +15,23 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Add the target to the rust toolchain
-RUN rustup +nightly target add $TARGET \
-    && rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
+RUN rustup +nightly target add $TARGET && \
+    if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
+        rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu; \
+    elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+        rustup component add rust-src --toolchain nightly-aarch64-unknown-linux-gnu; \
+    fi
 
-RUN wget https://toolchains.bootlin.com/downloads/releases/toolchains/riscv64-lp64d/tarballs/riscv64-lp64d--musl--bleeding-edge-2023.11-1.tar.bz2 \
-    && tar xvf riscv64-lp64d--musl--bleeding-edge-2023.11-1.tar.bz2 \
-    && rm riscv64-lp64d--musl--bleeding-edge-2023.11-1.tar.bz2
+
+RUN FILE_URL="" && \
+    if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
+        FILE_URL="https://github.com/ejortega/milkv-host-tools/releases/download/v1.0.0/toolchain-riscv64-unknown-linux-musl-amd64.tar.xz"; \
+    elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+        FILE_URL="https://github.com/ejortega/milkv-host-tools/releases/download/v1.0.0/toolchain-riscv64-unknown-linux-musl-arm64.tar.xz"; \
+    fi \
+    && curl -L -o toolchain.tar.xz $FILE_URL \
+    && tar -xf toolchain.tar.xz \
+    && rm toolchain.tar.xz
 
 WORKDIR /app
 

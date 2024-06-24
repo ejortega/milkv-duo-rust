@@ -4,49 +4,15 @@ This guide provides instructions on how to compile Rust projects for the Milk-V 
 
 This is inspired from reading https://barretts.club/posts/i-got-a-milkv-duo/.
 
-## Prerequisites
+## Prerequisites for building with Docker
 
-- Linux operating system (x86_64)
-- Docker installed on your system
-- Rust programming environment
-
-## Setup Instructions
-
-1. **Add RISC-V Target in Rust:**
-   Run the following command to add the `riscv64gc-unknown-linux-gnu` target.
-
-   ```bash
-   rustup +nightly target add riscv64gc-unknown-linux-gnu
-   ```
-
-2. **Download and Extract Toolchain:**
-
-   - Download the RISC-V toolchain from [this link](https://toolchains.bootlin.com/downloads/releases/toolchains/riscv64-lp64d/tarballs/riscv64-lp64d--musl--bleeding-edge-2023.11-1.tar.bz2).
-   - Extract it in your project directory:
-     ```bash
-     tar xvf riscv64-lp64d--musl--bleeding-edge-2023.11-1.tar.bz2
-     ```
-   - Update `.config/config.toml` in your project if you use a different toolchain version.
-
-3. **Compile:**
-
-   First make sure you the update the `linker` and `sysroot` paths in the `.config/cargo.toml`.
-
-   - Compile Debug
-
-   ```bash
-   cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std
-   ```
-
-   - Compile Release
-
-   ```bash
-   cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std --release
-   ```
+- Docker installed
 
 ## Docker Instructions
 
-### Use Prebuilt Docker Image
+### Using the Prebuilt Docker Image
+
+This is the easiest way to build as you can support all operating systems that have a docker installation and using x86_64 or aarch64 processors.
 
 1. **Build Debug Version:**
 
@@ -54,7 +20,7 @@ This is inspired from reading https://barretts.club/posts/i-got-a-milkv-duo/.
    docker run --rm -e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -v $PWD:/app ejortega/duo-rust cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std
    ```
 
-   or
+   or use the provided python script
 
    ```bash
    ./build.py
@@ -82,6 +48,50 @@ This is inspired from reading https://barretts.club/posts/i-got-a-milkv-duo/.
    Use the following command to compile your app. Replace `<tag>` with the tag used above.
    ```bash
    docker run --rm -e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -v $PWD:/app <tag> cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std --release
+   ```
+
+## Prerequisites without using Docker
+
+- Linux operating system (x86_64 or aarch64)
+- Rust programming environment
+
+## Setup Instructions
+
+1. **Add RISC-V Target in Rust:**
+   Run the following command to add the `riscv64gc-unknown-linux-gnu` target.
+
+   ```bash
+   rustup +nightly target add riscv64gc-unknown-linux-gnu
+   ```
+
+2. **Download and Extract Toolchain:**
+
+   - I've provided compiled toolchains for x86_64 and aarch64. Download the appropriate RISC-V toolchain from [this link](https://github.com/ejortega/milkv-host-tools).
+   - Extract it in your project directory:
+      ```bash
+      tar xvf toolchain-riscv64-unknown-linux-musl-amd64.tar.xz 
+      ```
+     or (depending on arch)
+
+      ```bash
+      tar xvf toolchain-riscv64-unknown-linux-musl-arm64.tar.xz 
+      ```
+   - Update `.config/config.toml` in your project if you use a different toolchain version or to update the linker and sysroot paths.
+
+3. **Compile:**
+
+   First make sure you the update the `linker` and `sysroot` paths in the `.config/cargo.toml`.
+
+   - Compile Debug
+
+   ```bash
+   cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std
+   ```
+
+   - Compile Release
+
+   ```bash
+   cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std --release
    ```
 
 ## Troubleshooting
