@@ -1,18 +1,22 @@
 #!/bin/bash
 set -e
 
-# Add local user
-# Either use the LOCAL_UID and LOCAL_GID if passed in at runtime or
-# fallback
+# Checking if UID and GID are passed as environment variables and need changing
+current_uid=$(id -u user)
+current_gid=$(id -g user)
 
-USER_ID=${LOCAL_UID:-9001}
-GROUP_ID=${LOCAL_GID:-9001}
+if [ "$LOCAL_UID" != "$current_uid" ]; then
+    echo "Updating UID from $current_uid to $LOCAL_UID"
+    usermod -u $LOCAL_UID user
+fi
 
-echo "Starting with UID: $USER_ID, GID: $GROUP_ID"
-groupadd -g "$GROUP_ID" user
-useradd --shell /bin/bash -u "$USER_ID" -g "$GROUP_ID" -o -c "" -m user
+if [ "$LOCAL_GID" != "$current_gid" ]; then
+    echo "Updating GID from $current_gid to $LOCAL_GID"
+    groupmod -g $LOCAL_GID user
+fi
 
-export HOME=/home/user
+# Correct ownership if necessary (e.g., after ID changes)
+chown -R user:user /home/user
 
-# Use gosu (similar to su-exec) to switch to the new user
-exec gosu user "$@"
+# Execute the passed command
+exec "$@"
