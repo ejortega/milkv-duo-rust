@@ -2,7 +2,7 @@
 
 This guide provides instructions on how to compile Rust projects for the Milk-V Duo, a device using the RISC-V architecture.
 
-This is inspired from reading https://barretts.club/posts/i-got-a-milkv-duo/.
+This is inspired from reading <https://barretts.club/posts/i-got-a-milkv-duo/>.
 
 ## Prerequisites for building with Docker
 
@@ -27,11 +27,14 @@ This is the easiest way to build as you can support all operating systems that h
    ```
 
 2. **Build Release Version:**
+
    ```bash
    docker run --rm -e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -v $PWD:/app ejortega/duo-rust cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std --release
    ```
+
    or
-   ```
+
+   ```bash
    ./build.py --release
    ```
 
@@ -46,6 +49,7 @@ This is the easiest way to build as you can support all operating systems that h
 
 2. **Compile Your Application:**
    Use the following command to compile your app. Replace `<tag>` with the tag used above.
+
    ```bash
    docker run --rm -e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -v $PWD:/app <tag> cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std --release
    ```
@@ -68,14 +72,17 @@ This is the easiest way to build as you can support all operating systems that h
 
    - I've provided compiled toolchains for x86_64 and aarch64. Download the appropriate RISC-V toolchain from [this link](https://github.com/ejortega/milkv-host-tools).
    - Extract it in your project directory:
+
       ```bash
       tar xvf toolchain-riscv64-unknown-linux-musl-amd64.tar.xz 
       ```
+
      or (depending on arch)
 
       ```bash
       tar xvf toolchain-riscv64-unknown-linux-musl-arm64.tar.xz 
       ```
+
    - Update `.config/config.toml` in your project if you use a different toolchain version or to update the linker and sysroot paths.
 
 3. **Compile:**
@@ -95,6 +102,7 @@ This is the easiest way to build as you can support all operating systems that h
    ```
 
 ## Troubleshooting
+
 *This should no longer be an issue after adding*
 `"-C", "link-arg=-Wl,--dynamic-linker=/lib/ld-musl-riscv64v0p7_xthead.so.1"` to the config.toml but I'll leave for reference.
 
