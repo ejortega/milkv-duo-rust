@@ -10,5 +10,5 @@ anyhow = "1.0.80"
 libc = "0.2.155"
 log = "0.4.21"
 
-# [dev-dependencies]
+[dev-dependencies]
 mockall = "0.12.1"

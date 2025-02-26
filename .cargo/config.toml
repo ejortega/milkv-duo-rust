@@ -1,10 +1,7 @@
 [target.riscv64gc-unknown-linux-musl]
-linker = "../toolchain-riscv64-unknown-linux-musl/bin/riscv64-unknown-linux-musl-gcc"
+linker = "riscv64-linux-gnu-gcc"
+
 rustflags = [
-    "-C",
-    "link-arg=-Wl,--dynamic-linker=/lib/ld-musl-riscv64v0p7_xthead.so.1",
-    "-C",
-    "target-feature=-crt-static",
-    "-C",
-    "link-arg=--sysroot=../toolchain-riscv64-unknown-linux-musl/riscv64-unknown-linux-musl/sysroot",
+    "-C", "link-arg=-Wl,--dynamic-linker=/lib/ld-musl-riscv64v0p7_xthead.so.1",
+    # "-C", "target-feature=+crt-static", # Uncomment for static compilation
 ]
