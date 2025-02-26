@@ -17,7 +17,7 @@ This is the easiest way to build as you can support all operating systems that h
 1. **Build Debug Version:**
 
    ```bash
-   docker run --rm -e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -v $PWD:/app ejortega/duo-rust cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std
+   docker run --rm -e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -v $PWD:/app ejortega/duo-rust:latest cargo build --target riscv64gc-unknown-linux-musl
    ```
 
    or use the provided python script
@@ -29,7 +29,7 @@ This is the easiest way to build as you can support all operating systems that h
 2. **Build Release Version:**
 
    ```bash
-   docker run --rm -e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -v $PWD:/app ejortega/duo-rust cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std --release
+   docker run --rm -e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -v $PWD:/app ejortega/duo-rust:latest cargo build --target riscv64gc-unknown-linux-musl --release
    ```
 
    or
@@ -51,7 +51,7 @@ This is the easiest way to build as you can support all operating systems that h
    Use the following command to compile your app. Replace `<tag>` with the tag used above.
 
    ```bash
-   docker run --rm -e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -v $PWD:/app <tag> cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std --release
+   docker run --rm -e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -v $PWD:/app <tag> cargo build --target riscv64gc-unknown-linux-musl --release
    ```
 
 ## Prerequisites without using Docker
@@ -68,66 +68,52 @@ This is the easiest way to build as you can support all operating systems that h
    rustup +nightly target add riscv64gc-unknown-linux-gnu
    ```
 
-2. **Download and Extract Toolchain:**
+2. **Add dependencies:**
 
-   - I've provided compiled toolchains for x86_64 and aarch64. Download the appropriate RISC-V toolchain from [this link](https://github.com/ejortega/milkv-host-tools).
-   - Extract it in your project directory:
+   Install `gcc-riscv64-linux-gnu` (or equivalent)
 
-      ```bash
-      tar xvf toolchain-riscv64-unknown-linux-musl-amd64.tar.xz 
-      ```
-
-     or (depending on arch)
-
-      ```bash
-      tar xvf toolchain-riscv64-unknown-linux-musl-arm64.tar.xz 
-      ```
-
-   - Update `.config/config.toml` in your project if you use a different toolchain version or to update the linker and sysroot paths.
+   ```bash
+   sudo apt install gcc-riscv64-linux-gnu
+   ```
 
 3. **Compile:**
 
-   First make sure you the update the `linker` and `sysroot` paths in the `.config/cargo.toml`.
+   You can enable/disable static compilation in `.config/cargo.toml`.
 
    - Compile Debug
 
    ```bash
-   cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std
+   cargo build --target riscv64gc-unknown-linux-musl
    ```
 
    - Compile Release
 
    ```bash
-   cargo +nightly build --target riscv64gc-unknown-linux-musl -Zbuild-std --release
+   cargo build --target riscv64gc-unknown-linux-musl --release
    ```
 
-## Troubleshooting
+4. **Testing:**
 
-*This should no longer be an issue after adding*
-`"-C", "link-arg=-Wl,--dynamic-linker=/lib/ld-musl-riscv64v0p7_xthead.so.1"` to the config.toml but I'll leave for reference.
+   Copy the `hello-world` binary to your duo (assuming release build):
 
-If you have trouble running the binary on the milk-v duo, the article mentions you can get by using:
+   ```bash
+   scp target/riscv64gc-unknown-linux-musl/release/hello-world root@192.168.42.1:/root/
+   ```
 
-```bash
-ln -sf /lib/ld-musl-riscv64v0p7_xthead.so.1 /lib/ld-musl-riscv64.so.1
-```
+   You may need `-O` for more recent versions of `scp`
 
-However, I would still get an error:
+   ```bash
+   scp -O target/riscv64gc-unknown-linux-musl/release/hello-world root@192.168.42.1:/root/
+   ```
 
-```bash
-[root@milkv-duo]~# ./hello-world 
-Error relocating ./hello-world: pthread_getname_np: symbol not found
-Error relocating ./hello-world: pthread_getname_np: symbol not found
-```
+   Update permission for the binary
 
-I was able to get away with copying `libc.so` from the toolchain onto the milk-v duo.
+   ```bash
+   [root@milkv-duo]~# chmod +x hello-world 
+   ```
 
-```bash
-scp ./riscv64-lp64d--musl--bleeding-edge-2023.11-1/riscv64-buildroot-linux-musl/sysroot/lib/libc.so root@192.168.42.1:/lib/ld-musl-riscv64.so.1
-```
-
-```bash
-[root@milkv-duo]~# ./hello-world 
-Hello, world!
-1970-01-01T00:47:05.638969Z  INFO milkv_duo_rust: Rust is the future
-```
+   ```bash
+   [root@milkv-duo]~# ./hello-world 
+   Hello, world!
+   1970-01-01T00:47:05.638969Z  INFO milkv_duo_rust: Rust is the future
+   ```
