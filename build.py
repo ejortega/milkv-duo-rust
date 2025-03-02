@@ -25,7 +25,7 @@ def run_docker_command(release=False):
         "-e", f"LOCAL_UID={os.getuid()}",
         "-e", f"LOCAL_GID={os.getgid()}",
         "-v", f"{os.getcwd()}:/app",
-        "ejortega/duo-rust:2.0", "cargo", "build",
+        "ejortega/milkv-duo-rust:2.0", "cargo", "build",
         "--target", "riscv64gc-unknown-linux-musl",
     ]
 
