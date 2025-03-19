@@ -130,7 +130,7 @@ pub struct MilkVDuoGpio<'a> {
     dev: DevMem,
 }
 
-impl<'a> Gpio for MilkVDuoGpio<'a> {
+impl Gpio for MilkVDuoGpio<'_> {
     fn new(port: GpioPort, pin: u32) -> Result<Self> {
         let bitmask = 1 << pin;
         let duo = DuoGpio::new(port.base_address())?;
@@ -242,7 +242,7 @@ impl<'a> Gpio for MilkVDuoGpio<'a> {
     }
 }
 
-impl<'a> Drop for MilkVDuoGpio<'a> {
+impl Drop for MilkVDuoGpio<'_> {
     fn drop(&mut self) {
         if let Err(e) = self.init(GpioInput) {
             log::error!("Error: {e}, unable to reset pin: {}", self.pin)
