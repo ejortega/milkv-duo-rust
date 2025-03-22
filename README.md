@@ -104,7 +104,7 @@ This is the easiest way to build as you can support all operating systems that h
    cargo build --target riscv64gc-unknown-linux-musl --release
    ```
 
-4. **Testing:**
+## Testing
 
    Copy the `hello-world` binary to your duo (assuming release build):
 
