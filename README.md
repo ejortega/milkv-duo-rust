@@ -64,23 +64,33 @@ This is the easiest way to build as you can support all operating systems that h
 ## Setup Instructions
 
 1. **Add RISC-V Target in Rust:**
-   Run the following command to add the `riscv64gc-unknown-linux-gnu` target.
+   Run the following command to add the `riscv64gc-unknown-linux-musl` target.
 
    ```bash
-   rustup target add riscv64gc-unknown-linux-gnu
+   rustup target add riscv64gc-unknown-linux-musl
    ```
 
-2. **Add dependencies:**
+2. **Download a risv64 musl toolchain:**
 
-   Install `gcc-riscv64-linux-gnu` (or equivalent)
+   <https://github.com/ejortega/milkv-host-tools/releases/tag/v2.0.0>
+
+   Alternatives:
+      - <https://toolchains.bootlin.com/releases_riscv64.html>
+      - <https://github.com/riscv-collab/riscv-gnu-toolchain>
+
+   Ensure the path to the linker in is updated in the `config/cargo.toml`.
+
+   You might get away with installing `gcc-riscv64-linux-gnu` via:
 
    ```bash
    sudo apt install gcc-riscv64-linux-gnu
    ```
 
+   and updating the linker with `linker = "riscv64-linux-gnu-gcc"`. However since the milkv duo uses musl, you might have compatability issues.
+
 3. **Compile:**
 
-   You can enable/disable static compilation in `.config/cargo.toml`.
+   Update `.config/cargo.toml`.
 
    - Compile Debug
 

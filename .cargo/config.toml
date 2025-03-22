@@ -1,7 +1,8 @@
 [target.riscv64gc-unknown-linux-musl]
-linker = "riscv64-linux-gnu-gcc"
+linker = "riscv64-unknown-linux-musl-gcc"
 
 rustflags = [
-    "-C", "link-arg=-Wl,--dynamic-linker=/lib/ld-musl-riscv64v0p7_xthead.so.1",
+    "-C",
+    "link-arg=-Wl,--dynamic-linker=/lib/ld-musl-riscv64v0p7_xthead.so.1",
     # "-C", "target-feature=+crt-static", # Uncomment for static compilation
 ]
