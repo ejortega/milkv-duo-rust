@@ -9,4 +9,4 @@ edition = "2021"
 anyhow = "1.0.80"
 tokio = { version = "1.43.1", features = ["rt", "macros"] }
 tracing = { version = "0.1.40", features = ["async-await"] }
-tracing-subscriber = "0.3.18"
+tracing-subscriber = "0.3.20"
