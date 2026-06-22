@@ -19,7 +19,7 @@ This is the easiest way to build as you can support all operating systems that h
 1. **Build Debug Version:**
 
    ```bash
-   docker run --rm -e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -v $PWD:/app ejortega/duo-rust:2.0 cargo build --target riscv64gc-unknown-linux-musl
+   docker run --rm -e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -v $PWD:/app ejortega/milkv-duo-rust:2.0 cargo build --target riscv64gc-unknown-linux-musl
    ```
 
    or use the provided python script
@@ -31,7 +31,7 @@ This is the easiest way to build as you can support all operating systems that h
 2. **Build Release Version:**
 
    ```bash
-   docker run --rm -e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -v $PWD:/app ejortega/duo-rust:2.0 cargo build --target riscv64gc-unknown-linux-musl --release
+   docker run --rm -e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -v $PWD:/app ejortega/milkv-duo-rust:2.0 cargo build --target riscv64gc-unknown-linux-musl --release
    ```
 
    or
